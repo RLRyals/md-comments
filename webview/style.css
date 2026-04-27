@@ -1,0 +1,376 @@
+:root {
+  color-scheme: light dark;
+}
+
+/* Ensure the [hidden] attribute always wins over class-level display: rules. */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family, system-ui, sans-serif);
+  font-size: var(--vscode-font-size, 14px);
+}
+
+.mdc-layout {
+  display: grid;
+  grid-template-columns: 1fr minmax(240px, 320px);
+  gap: 24px;
+  align-items: start;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 96px;
+}
+@media (max-width: 800px) {
+  .mdc-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mdc-root {
+  min-width: 0;
+  line-height: 1.65;
+  outline: none;
+}
+
+.mdc-root h1,
+.mdc-root h2,
+.mdc-root h3,
+.mdc-root h4 {
+  font-weight: 600;
+  margin: 1.6em 0 0.6em;
+  line-height: 1.25;
+}
+.mdc-root h1 { font-size: 1.9em; border-bottom: 1px solid var(--vscode-widget-border, #444); padding-bottom: 0.2em; }
+.mdc-root h2 { font-size: 1.5em; border-bottom: 1px solid var(--vscode-widget-border, #444); padding-bottom: 0.2em; }
+.mdc-root h3 { font-size: 1.25em; }
+.mdc-root h4 { font-size: 1.1em; }
+
+.mdc-root p { margin: 0.8em 0; }
+.mdc-root ul, .mdc-root ol { margin: 0.6em 0; padding-left: 1.6em; }
+.mdc-root li { margin: 0.2em 0; }
+.mdc-root blockquote {
+  margin: 0.8em 0;
+  padding: 0.2em 1em;
+  border-left: 4px solid var(--vscode-textBlockQuote-border, #555);
+  background: var(--vscode-textBlockQuote-background, transparent);
+  color: var(--vscode-descriptionForeground, inherit);
+}
+.mdc-root code {
+  font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
+  background: var(--vscode-textCodeBlock-background, rgba(127, 127, 127, 0.15));
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+.mdc-root pre {
+  background: var(--vscode-textCodeBlock-background, rgba(127, 127, 127, 0.15));
+  padding: 12px 14px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.mdc-root pre code { background: transparent; padding: 0; }
+.mdc-root a { color: var(--vscode-textLink-foreground, #4daafc); }
+.mdc-root hr { border: none; border-top: 1px solid var(--vscode-widget-border, #444); margin: 1.6em 0; }
+
+/* highlight ----------------------------------------------------------- */
+mark.mdc-highlight {
+  background: rgba(255, 220, 80, 0.45);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+  text-decoration: underline dotted rgba(180, 130, 0, 0.6);
+  text-underline-offset: 3px;
+}
+mark.mdc-highlight:hover {
+  background: rgba(255, 220, 80, 0.75);
+}
+body.vscode-dark mark.mdc-highlight,
+:root[data-vscode-theme-kind='vscode-dark'] mark.mdc-highlight {
+  background: rgba(255, 200, 60, 0.28);
+}
+body.vscode-dark mark.mdc-highlight:hover {
+  background: rgba(255, 200, 60, 0.5);
+}
+
+/* selection toolbar --------------------------------------------------- */
+.mdc-toolbar {
+  position: absolute;
+  z-index: 10;
+  background: var(--vscode-editorWidget-background, #2a2a2a);
+  border: 1px solid var(--vscode-widget-border, #555);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 4px;
+}
+.mdc-toolbar button {
+  background: transparent;
+  color: var(--vscode-editorWidget-foreground, inherit);
+  border: none;
+  padding: 4px 10px;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.mdc-toolbar button:hover {
+  background: var(--vscode-list-hoverBackground, rgba(255, 255, 255, 0.08));
+}
+
+/* popup --------------------------------------------------------------- */
+.mdc-popup {
+  position: absolute;
+  z-index: 20;
+  width: 320px;
+  background: var(--vscode-editorWidget-background, #2a2a2a);
+  color: var(--vscode-editorWidget-foreground, inherit);
+  border: 1px solid var(--vscode-widget-border, #555);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mdc-popup textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--vscode-input-background, #1e1e1e);
+  color: var(--vscode-input-foreground, inherit);
+  border: 1px solid var(--vscode-input-border, #555);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font: inherit;
+  resize: vertical;
+  min-height: 60px;
+}
+.mdc-popup textarea:focus {
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: -1px;
+}
+.mdc-popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mdc-popup-actions .mdc-spacer { flex: 1; }
+.mdc-popup-actions button {
+  background: var(--vscode-button-secondaryBackground, #3a3a3a);
+  color: var(--vscode-button-secondaryForeground, inherit);
+  border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+}
+.mdc-popup-actions button:hover {
+  background: var(--vscode-button-secondaryHoverBackground, #4a4a4a);
+}
+.mdc-popup-actions button.mdc-primary {
+  background: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, white);
+}
+.mdc-popup-actions button.mdc-primary:hover {
+  background: var(--vscode-button-hoverBackground, #1177bb);
+}
+.mdc-popup-actions button.mdc-danger {
+  background: var(--vscode-errorForeground, #c0392b);
+  color: white;
+}
+
+/* sidebar ------------------------------------------------------------ */
+.mdc-sidebar {
+  position: sticky;
+  top: 32px;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  border-left: 1px solid var(--vscode-widget-border, #444);
+  padding-left: 16px;
+  font-size: 0.92em;
+}
+.mdc-sidebar-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--vscode-widget-border, #444);
+}
+.mdc-sidebar-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.85em;
+  color: var(--vscode-descriptionForeground, inherit);
+}
+.mdc-sidebar-count {
+  font-variant-numeric: tabular-nums;
+  background: var(--vscode-badge-background, rgba(127, 127, 127, 0.25));
+  color: var(--vscode-badge-foreground, inherit);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 0.8em;
+}
+.mdc-sidebar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mdc-sidebar-empty {
+  color: var(--vscode-descriptionForeground, inherit);
+  font-style: italic;
+  margin: 12px 0 0;
+}
+.mdc-sidebar-item { margin: 0; }
+.mdc-sidebar-card {
+  width: 100%;
+  text-align: left;
+  background: var(--vscode-editorWidget-background, rgba(127, 127, 127, 0.08));
+  color: inherit;
+  border: 1px solid var(--vscode-widget-border, #444);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mdc-sidebar-card:hover {
+  background: var(--vscode-list-hoverBackground, rgba(127, 127, 127, 0.18));
+}
+.mdc-sidebar-card:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 1px;
+}
+.mdc-sidebar-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.78em;
+  color: var(--vscode-descriptionForeground, inherit);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.mdc-sidebar-num { font-weight: 600; }
+.mdc-sidebar-snippet {
+  font-style: italic;
+  color: var(--vscode-descriptionForeground, inherit);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mdc-sidebar-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* flash highlight when jumping from sidebar */
+mark.mdc-flash, span.mdc-flash {
+  animation: mdcFlash 0.9s ease-out;
+}
+@keyframes mdcFlash {
+  0%   { box-shadow: 0 0 0 4px rgba(255, 200, 60, 0.7); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 200, 60, 0); }
+}
+
+/* point comment pin -------------------------------------------------- */
+.mdc-pin {
+  display: inline-block;
+  vertical-align: baseline;
+  width: 1.2em;
+  height: 1.2em;
+  line-height: 1.2em;
+  text-align: center;
+  margin: 0 1px;
+  border-radius: 50%;
+  background: rgba(255, 200, 60, 0.35);
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.78em;
+  position: relative;
+  top: -0.05em;
+}
+.mdc-pin:hover {
+  background: rgba(255, 200, 60, 0.7);
+}
+.mdc-pin-glyph {
+  display: inline-block;
+  transform: scale(0.85);
+}
+body.vscode-dark .mdc-pin {
+  background: rgba(255, 200, 60, 0.22);
+}
+body.vscode-dark .mdc-pin:hover {
+  background: rgba(255, 200, 60, 0.45);
+}
+.mdc-pin:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 2px;
+}
+
+/* focus rings -------------------------------------------------------- */
+mark.mdc-highlight:focus {
+  outline: 2px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 2px;
+}
+mark.mdc-highlight:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 2px;
+}
+.mdc-toolbar button:focus-visible,
+.mdc-popup button:focus-visible,
+.mdc-menu button:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: -1px;
+}
+
+/* context menu ------------------------------------------------------- */
+.mdc-menu {
+  position: absolute;
+  z-index: 30;
+  min-width: 180px;
+  background: var(--vscode-menu-background, var(--vscode-editorWidget-background, #2a2a2a));
+  color: var(--vscode-menu-foreground, var(--vscode-editorWidget-foreground, inherit));
+  border: 1px solid var(--vscode-menu-border, var(--vscode-widget-border, #555));
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+}
+.mdc-menu-item {
+  background: transparent;
+  color: inherit;
+  border: none;
+  text-align: left;
+  padding: 6px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+.mdc-menu-item:hover:not([disabled]),
+.mdc-menu-item:focus {
+  background: var(--vscode-menu-selectionBackground, var(--vscode-list-hoverBackground, rgba(255, 255, 255, 0.08)));
+  color: var(--vscode-menu-selectionForeground, inherit);
+  outline: none;
+}
+.mdc-menu-item[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+.mdc-menu-item.mdc-danger {
+  color: var(--vscode-errorForeground, #e06c75);
+}
