@@ -44,6 +44,10 @@ jobs:
       - name: Package VSIX
         run: npx vsce package --out "md-comments-${GITHUB_REF_NAME#v}.vsix"
 
+      - name: Compute version
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -54,5 +58,5 @@ jobs:
 
             Or from the command line:
             ```
-            code --install-extension md-comments-${{ github.ref_name }}.vsix
+            code --install-extension md-comments-${{ steps.version.outputs.value }}.vsix
             ```
