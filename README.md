@@ -2,6 +2,8 @@
 
 A VS Code extension that opens a markdown file in a pretty rendered view, lets you highlight text or drop pins to attach comments, and saves the comments as plain HTML markers inside the `.md` file itself.
 
+> **License:** [PolyForm Noncommercial 1.0.0](LICENSE) — free for personal, hobby, research, education, and other noncommercial use. Commercial use is not permitted. If you want to use this commercially, get in touch.
+
 ## Install
 
 1. Go to the [latest release](https://github.com/RLRyals/md-comments/releases/latest) and download the `md-comments-*.vsix` asset.

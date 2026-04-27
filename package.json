@@ -2,9 +2,9 @@
   "name": "md-comments",
   "displayName": "MD Comments",
   "description": "Pretty-view editor for markdown files with inline highlight comments saved as paired HTML comment markers.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "rebeccaryals",
-  "license": "MIT",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/RLRyals/md-comments.git"

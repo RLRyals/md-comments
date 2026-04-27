@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.1 — 2026-04-27
+
+- **License changed** from MIT to [PolyForm Noncommercial 1.0.0](LICENSE). Free for personal, hobby, research, and education use; commercial use is not permitted. The v0.1.0 VSIX remains under MIT.
+- No code changes.
+
 ## v0.1.0 — 2026-04-27
 
 Initial release.
