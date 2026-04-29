@@ -35,7 +35,10 @@ export class MdCommentsEditorProvider implements vscode.CustomTextEditorProvider
      * set is treated as an external edit and pushed.
      */
     const ourPendingContent = new Set<string>();
-    let lastPushedHtml = lastRender.html;
+    // Sentinel: no HTML pushed yet, so the first pushHtml() always sends.
+    // Initializing this to lastRender.html caused the webview to receive
+    // nothing on 'ready', leaving the document area blank.
+    let lastPushedHtml: string | null = null;
 
     const post = (msg: ToWebview): void => {
       void webviewPanel.webview.postMessage(msg);

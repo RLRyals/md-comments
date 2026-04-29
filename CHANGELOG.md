@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.2 — 2026-04-29
+
+- **Fix**: document area rendered blank on open. The provider seeded its "last pushed HTML" cache with the initial render, so the first `setHtml` push to the webview was suppressed by the equality guard and the article was never populated.
+
 ## v0.1.1 — 2026-04-27
 
 - **License changed** from MIT to [PolyForm Noncommercial 1.0.0](LICENSE). Free for personal, hobby, research, and education use; commercial use is not permitted. The v0.1.0 VSIX remains under MIT.
