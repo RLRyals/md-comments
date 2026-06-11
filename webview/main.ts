@@ -1,5 +1,5 @@
 import './style.css';
-import type { FromWebview, ToWebview } from '../src/types';
+import type { CommentLayout, FromWebview, ToWebview } from '../src/types';
 
 declare const acquireVsCodeApi: () => {
   postMessage(msg: FromWebview): void;
@@ -23,6 +23,18 @@ const sidebarCount = document.getElementById('mdc-sidebar-count') as HTMLElement
 const sidebarEmpty = document.getElementById('mdc-sidebar-empty') as HTMLElement;
 
 const COMMENT_NODE_SELECTOR = 'mark.mdc-highlight, span.mdc-pin';
+const INLINE_PANEL_CLASS = 'mdc-inline-panel';
+
+function currentLayout(): CommentLayout {
+  return document.body.getAttribute('data-comment-layout') === 'inline'
+    ? 'inline'
+    : 'sidebar';
+}
+
+function setLayout(layout: CommentLayout): void {
+  document.body.setAttribute('data-comment-layout', layout);
+  refreshCommentViews();
+}
 
 type PopupMode =
   | { kind: 'newHighlight'; range: Range }
@@ -45,9 +57,11 @@ window.addEventListener('message', (e) => {
     const scrollY = window.scrollY;
     root.innerHTML = msg.html;
     bindCommentNodes();
-    refreshSidebar();
+    refreshCommentViews();
     // Restore scroll so external edits don't yank the user to the top.
     window.scrollTo({ top: scrollY });
+  } else if (msg.type === 'setLayout') {
+    setLayout(msg.layout);
   } else if (msg.type === 'error') {
     console.error('[md-comments] extension error:', msg.message);
   }
@@ -102,7 +116,7 @@ function bindCommentNodes(): void {
       }
     });
   });
-  refreshSidebar();
+  refreshCommentViews();
 }
 
 function openEditPopup(node: HTMLElement): void {
@@ -224,7 +238,7 @@ popupSave.addEventListener('click', () => {
     const id = popupMode.node.getAttribute('data-id') ?? '';
     popupMode.node.setAttribute('data-comment', text);
     send({ type: 'editComment', id, comment: text });
-    refreshSidebar();
+    refreshCommentViews();
     closePopup();
     return;
   }
@@ -313,7 +327,7 @@ function deleteCommentNode(node: HTMLElement): void {
     node.parentNode?.removeChild(node);
   }
   send({ type: 'deleteComment', id });
-  refreshSidebar();
+  refreshCommentViews();
 }
 
 // ── context menu ──────────────────────────────────────────────────────────
@@ -499,7 +513,13 @@ root.addEventListener('input', () => {
 });
 
 function flushProseEdit(): void {
-  send({ type: 'proseEdit', html: root.innerHTML });
+  // Strip inline-comment panels before serializing so they don't end up
+  // in the markdown source.
+  const clone = root.cloneNode(true) as HTMLElement;
+  clone
+    .querySelectorAll(`.${INLINE_PANEL_CLASS}`)
+    .forEach((n) => n.parentNode?.removeChild(n));
+  send({ type: 'proseEdit', html: clone.innerHTML });
 }
 
 // ── helpers ───────────────────────────────────────────────────────────────
@@ -604,4 +624,99 @@ function focusComment(node: HTMLElement): void {
   node.focus();
 }
 
-refreshSidebar();
+// ── inline comment panels ─────────────────────────────────────────────────
+function refreshCommentViews(): void {
+  refreshSidebar();
+  refreshInlinePanels();
+}
+
+function refreshInlinePanels(): void {
+  // Always start from a clean slate so removed/edited comments don't linger.
+  root
+    .querySelectorAll(`.${INLINE_PANEL_CLASS}`)
+    .forEach((n) => n.parentNode?.removeChild(n));
+
+  if (currentLayout() !== 'inline') return;
+
+  // Global numbering matches the sidebar order (document order).
+  const allNodes = Array.from(
+    root.querySelectorAll<HTMLElement>(COMMENT_NODE_SELECTOR)
+  );
+  const numberOf = new Map<HTMLElement, number>();
+  allNodes.forEach((n, i) => numberOf.set(n, i + 1));
+
+  const blocks = Array.from(
+    root.querySelectorAll<HTMLElement>('[data-block-index]')
+  );
+  blocks.forEach((block) => {
+    const nodes = Array.from(
+      block.querySelectorAll<HTMLElement>(COMMENT_NODE_SELECTOR)
+    );
+    if (nodes.length === 0) return;
+
+    const panel = document.createElement('div');
+    panel.className = INLINE_PANEL_CLASS;
+    panel.setAttribute('contenteditable', 'false');
+    panel.setAttribute('aria-label', 'Comments on this block');
+
+    const header = document.createElement('div');
+    header.className = 'mdc-inline-panel-header';
+    const headerLabel = document.createElement('span');
+    headerLabel.className = 'mdc-inline-panel-title';
+    headerLabel.textContent =
+      nodes.length === 1 ? '1 comment' : `${nodes.length} comments`;
+    header.appendChild(headerLabel);
+    panel.appendChild(header);
+
+    nodes.forEach((node) => {
+      const isPin = node.matches('span.mdc-pin');
+      const comment = node.getAttribute('data-comment') ?? '';
+      const num = numberOf.get(node) ?? 0;
+
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'mdc-inline-card';
+
+      const meta = document.createElement('div');
+      meta.className = 'mdc-inline-meta';
+      const numEl = document.createElement('span');
+      numEl.className = 'mdc-inline-num';
+      numEl.textContent = `#${num}`;
+      const kindEl = document.createElement('span');
+      kindEl.className = 'mdc-inline-kind';
+      kindEl.textContent = isPin ? '💬 point' : '🖍 highlight';
+      meta.append(numEl, kindEl);
+
+      const body = document.createElement('div');
+      body.className = 'mdc-inline-body';
+      body.textContent = comment || '(empty)';
+
+      if (!isPin) {
+        const snippet = document.createElement('div');
+        snippet.className = 'mdc-inline-snippet';
+        snippet.textContent = `“${(node.textContent ?? '').trim().slice(0, 80)}”`;
+        card.append(meta, snippet, body);
+      } else {
+        card.append(meta, body);
+      }
+
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openEditPopup(node);
+      });
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openEditPopup(node);
+        }
+      });
+
+      panel.appendChild(card);
+    });
+
+    block.parentNode?.insertBefore(panel, block);
+  });
+}
+
+refreshCommentViews();

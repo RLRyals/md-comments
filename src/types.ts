@@ -11,6 +11,9 @@ export type FromWebview =
   | { type: 'deleteComment'; id: string }
   | { type: 'proseEdit'; html: string };
 
+export type CommentLayout = 'sidebar' | 'inline';
+
 export type ToWebview =
   | { type: 'setHtml'; html: string; version: number }
+  | { type: 'setLayout'; layout: CommentLayout }
   | { type: 'error'; message: string };

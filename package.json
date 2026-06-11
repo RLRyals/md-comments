@@ -2,7 +2,7 @@
   "name": "md-comments",
   "displayName": "MD Comments",
   "description": "Pretty-view editor for markdown files with inline highlight comments saved as paired HTML comment markers.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "rebeccaryals",
   "license": "PolyForm-Noncommercial-1.0.0",
   "repository": {
@@ -27,8 +27,12 @@
         "viewType": "mdComments.editor",
         "displayName": "MD Comments (Pretty View)",
         "selector": [
-          { "filenamePattern": "*.md" },
-          { "filenamePattern": "*.markdown" }
+          {
+            "filenamePattern": "*.md"
+          },
+          {
+            "filenamePattern": "*.markdown"
+          }
         ],
         "priority": "option"
       }
@@ -55,6 +59,24 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "MD Comments",
+      "properties": {
+        "mdComments.commentLayout": {
+          "type": "string",
+          "enum": [
+            "sidebar",
+            "inline"
+          ],
+          "enumDescriptions": [
+            "Show comments in a sidebar to the right of the document.",
+            "Show comments in a panel rendered above each commented block."
+          ],
+          "default": "sidebar",
+          "description": "How comments are displayed in the MD Comments pretty view."
+        }
+      }
     }
   },
   "scripts": {

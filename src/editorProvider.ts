@@ -3,7 +3,14 @@ import MarkdownIt from 'markdown-it';
 import { createMd, render, RenderResult } from './render';
 import { serializeBlock } from './serialize';
 import { replaceCommentInSource, stripMarkersInSource } from './markers';
-import type { FromWebview, ToWebview } from './types';
+import type { CommentLayout, FromWebview, ToWebview } from './types';
+
+function readCommentLayout(): CommentLayout {
+  const raw = vscode.workspace
+    .getConfiguration('mdComments')
+    .get<string>('commentLayout', 'sidebar');
+  return raw === 'inline' ? 'inline' : 'sidebar';
+}
 
 export class MdCommentsEditorProvider implements vscode.CustomTextEditorProvider {
   public static readonly viewType = 'mdComments.editor';
@@ -24,7 +31,7 @@ export class MdCommentsEditorProvider implements vscode.CustomTextEditorProvider
       localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'dist')]
     };
 
-    webviewPanel.webview.html = this.getHtmlShell(webviewPanel.webview);
+    webviewPanel.webview.html = this.getHtmlShell(webviewPanel.webview, readCommentLayout());
 
     let lastRender: RenderResult = render(this.md, document.getText());
     /**
@@ -103,9 +110,15 @@ export class MdCommentsEditorProvider implements vscode.CustomTextEditorProvider
       }
     });
 
+    const cfgSub = vscode.workspace.onDidChangeConfiguration((e) => {
+      if (!e.affectsConfiguration('mdComments.commentLayout')) return;
+      post({ type: 'setLayout', layout: readCommentLayout() });
+    });
+
     webviewPanel.onDidDispose(() => {
       docSub.dispose();
       msgSub.dispose();
+      cfgSub.dispose();
     });
   }
 
@@ -188,7 +201,7 @@ export class MdCommentsEditorProvider implements vscode.CustomTextEditorProvider
     await vscode.workspace.applyEdit(edit);
   }
 
-  private getHtmlShell(webview: vscode.Webview): string {
+  private getHtmlShell(webview: vscode.Webview, layout: CommentLayout): string {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview.js')
     );
@@ -212,7 +225,7 @@ export class MdCommentsEditorProvider implements vscode.CustomTextEditorProvider
     <link rel="stylesheet" href="${styleUri}" />
     <title>MD Comments</title>
   </head>
-  <body>
+  <body data-comment-layout="${layout}">
     <div id="mdc-toolbar" class="mdc-toolbar" hidden>
       <button id="mdc-add-comment" type="button">💬 Comment</button>
     </div>

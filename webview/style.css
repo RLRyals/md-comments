@@ -32,6 +32,15 @@ body {
   }
 }
 
+/* Inline-comment layout: sidebar is hidden, document gets the full width. */
+body[data-comment-layout='inline'] .mdc-layout {
+  grid-template-columns: 1fr;
+  max-width: 880px;
+}
+body[data-comment-layout='inline'] .mdc-sidebar {
+  display: none;
+}
+
 .mdc-root {
   min-width: 0;
   line-height: 1.65;
@@ -336,6 +345,76 @@ mark.mdc-highlight:focus-visible {
 .mdc-menu button:focus-visible {
   outline: 1px solid var(--vscode-focusBorder, #007acc);
   outline-offset: -1px;
+}
+
+/* inline comment panel ----------------------------------------------- */
+.mdc-inline-panel {
+  margin: 12px 0 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--vscode-widget-border, #444);
+  border-left: 3px solid var(--vscode-focusBorder, #007acc);
+  border-radius: 6px;
+  background: var(--vscode-editorWidget-background, rgba(127, 127, 127, 0.08));
+  color: var(--vscode-editorWidget-foreground, inherit);
+  font-size: 0.92em;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mdc-inline-panel-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.mdc-inline-panel-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78em;
+  color: var(--vscode-descriptionForeground, inherit);
+}
+.mdc-inline-card {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  border: 1px solid var(--vscode-widget-border, #444);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mdc-inline-card:hover {
+  background: var(--vscode-list-hoverBackground, rgba(127, 127, 127, 0.18));
+}
+.mdc-inline-card:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 1px;
+}
+.mdc-inline-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.78em;
+  color: var(--vscode-descriptionForeground, inherit);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.mdc-inline-num { font-weight: 600; }
+.mdc-inline-snippet {
+  font-style: italic;
+  color: var(--vscode-descriptionForeground, inherit);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mdc-inline-body {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* context menu ------------------------------------------------------- */
