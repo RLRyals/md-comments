@@ -103,6 +103,27 @@ export function createMd(): MarkdownIt {
   };
   md.renderer.rules.mdc_close = () => '</mark>';
 
+  // markdown-it encodes table-cell alignment as `style="text-align:left"`.
+  // turndown-plugin-gfm recovers alignment from an `align` attribute instead,
+  // so mirror the style into `align` to keep `:---`/`:-:`/`---:` separators
+  // through the HTML round-trip. The deprecated `align` attribute is also still
+  // honored visually by browsers in the contenteditable view.
+  const addAlignAttr = (token: MdToken): void => {
+    const style = token.attrGet('style');
+    if (!style) return;
+    const m = /text-align:\s*(left|right|center)/.exec(style);
+    if (m) token.attrSet('align', m[1]);
+  };
+  for (const name of ['th_open', 'td_open'] as const) {
+    const base = md.renderer.rules[name];
+    md.renderer.rules[name] = (tokens, idx, options, env, self) => {
+      addAlignAttr(tokens[idx] as unknown as MdToken);
+      return base
+        ? base(tokens, idx, options, env, self)
+        : self.renderToken(tokens, idx, options);
+    };
+  }
+
   md.renderer.rules.mdc_point = (tokens, idx) => {
     const tok = tokens[idx];
     const id = tok.attrGet('data-id') ?? '';

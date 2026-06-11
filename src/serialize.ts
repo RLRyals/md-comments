@@ -1,4 +1,5 @@
 import TurndownService from 'turndown';
+import { gfm } from 'turndown-plugin-gfm';
 import { buildMarkerPair, buildPointMarker } from './markers';
 
 let cached: TurndownService | null = null;
@@ -9,10 +10,17 @@ export function getTurndown(): TurndownService {
     headingStyle: 'atx',
     bulletListMarker: '-',
     codeBlockStyle: 'fenced',
-    emDelimiter: '_',
+    // Use '*' to match markdown-it's emphasis output. Turndown's default of
+    // '_' rewrites every *italic* in the document to _italic_ on round-trip.
+    emDelimiter: '*',
     strongDelimiter: '**',
     linkStyle: 'inlined'
   });
+
+  // GFM support: turndown has no built-in <table> rule, so tables flatten to
+  // one-cell-per-line paragraphs without this plugin. Also adds strikethrough
+  // and task-list handling.
+  td.use(gfm);
 
   // Preserve comment highlights: emit paired markers around the inner markdown.
   td.addRule('mdcHighlight', {
