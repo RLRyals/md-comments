@@ -2,7 +2,7 @@
   "name": "md-comments",
   "displayName": "MD Comments",
   "description": "Pretty-view editor for markdown files with inline highlight comments saved as paired HTML comment markers.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "rebeccaryals",
   "license": "PolyForm-Noncommercial-1.0.0",
   "repository": {

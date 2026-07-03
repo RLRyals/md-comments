@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.4 — 2026-07-03
+
+- **Fix**: commenting a whole paragraph (or its first word) no longer duplicates paragraphs in the raw file. When a comment marker landed at the *start* of a block, markdown-it parsed the entire paragraph as a raw `html_block` instead of a paragraph — so that block lost its `data-block-index`, dropped out of the line-range map, and shifted every following block's index. Subsequent comments then targeted the wrong source lines, writing a commented copy next to the original ("the same thing twice") and losing the highlight from the pretty view. Added a block-rule guard so marker-led lines stay paragraphs, keeping block indices aligned and the `<mark>` rendered.
+- Added a regression test covering whole-paragraph comments preserving block indices and the highlight.
+
 ## v0.1.3 — 2026-06-11
 
 - **Fix**: saving from the pretty view no longer flattens GFM pipe tables or rewrites `*italic*` to `_italic_` ([#1](https://github.com/RLRyals/md-comments/issues/1)). `turndown` has no built-in `<table>` rule and defaulted `emDelimiter` to `_`; added `turndown-plugin-gfm` and set `emDelimiter` to `*`. Table-cell alignment (`:---` / `:-:` / `---:`) now survives the HTML round-trip via an `align` attribute mirrored from markdown-it's alignment styles.

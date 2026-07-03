@@ -65,6 +65,33 @@ test('*asterisk* italics delimiter is preserved (not rewritten to _)', () => {
   assert.doesNotMatch(out, /_emphasized_/, `should not rewrite to underscores in:\n${out}`);
 });
 
+test('a comment covering a whole paragraph stays a block with its <mark> intact', () => {
+  // Regression: when a paragraph begins with an mdc:start marker (commenting the
+  // whole paragraph or its first word), markdown-it used to parse the line as a
+  // raw html_block, dropping its data-block-index and shifting every following
+  // block index — which made later block edits target the wrong lines and
+  // duplicate paragraphs. The marker-led line must stay a paragraph.
+  const source = [
+    '<!-- mdc:start id="p1" -->First paragraph.<!-- mdc:end id="p1" comment="a" -->',
+    '',
+    'Second paragraph.',
+    '',
+    'Third paragraph.'
+  ].join('\n');
+
+  const { html, blockLineRanges } = render(md, source);
+
+  // All three paragraphs are still indexable top-level blocks.
+  assert.equal(blockLineRanges.length, 3, `expected 3 block ranges, got ${JSON.stringify(blockLineRanges)}`);
+  assert.deepEqual(blockLineRanges, [[0, 1], [2, 3], [4, 5]]);
+
+  // Indices are contiguous 0,1,2 and the first block is a real <p> with the <mark>.
+  assert.match(html, /<p data-block-index="0"><mark class="mdc-highlight" data-id="p1"/,
+    `first paragraph should render as a <p> containing the highlight, got:\n${html}`);
+  assert.match(html, /data-block-index="1"[^>]*>Second paragraph\./);
+  assert.match(html, /data-block-index="2"[^>]*>Third paragraph\./);
+});
+
 test('comment inserted into a table cell leaves the table intact', () => {
   // A comment is stored as paired mdc markers wrapping the cell text.
   const source = [

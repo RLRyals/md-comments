@@ -36,6 +36,37 @@ export function createMd(): MarkdownIt {
     typographer: false
   });
 
+  // Block-level guard: when a block *begins* with one of our mdc markers (e.g. a
+  // comment covers the whole paragraph or its first word), markdown-it's
+  // `html_block` rule sees the leading `<!--` and swallows the entire paragraph
+  // as a raw HTML block. That block then never gets a `data-block-index`, so it
+  // drops out of `blockLineRanges` and shifts every following block's index —
+  // which makes later block edits target the wrong source lines and duplicate
+  // paragraphs. Bail out of `html_block` for marker-led lines so the paragraph
+  // rule handles them and the inline `mdc_marker` rule can emit the <mark>.
+  const blockRuler = md.block.ruler as unknown as {
+    __rules__: Array<{ name: string; fn: (...a: unknown[]) => boolean }>;
+    at(name: string, fn: (...a: unknown[]) => boolean): void;
+  };
+  const originalHtmlBlock = blockRuler.__rules__.find(
+    (r) => r.name === 'html_block'
+  )?.fn;
+  if (originalHtmlBlock) {
+    blockRuler.at('html_block', (...args: unknown[]) => {
+      const state = args[0] as {
+        src: string;
+        bMarks: number[];
+        eMarks: number[];
+        tShift: number[];
+      };
+      const startLine = args[1] as number;
+      const pos = state.bMarks[startLine] + state.tShift[startLine];
+      const line = state.src.slice(pos, state.eMarks[startLine]);
+      if (/^<!--\s*mdc:(start|end|point)\b/.test(line)) return false;
+      return originalHtmlBlock(...args);
+    });
+  }
+
   // Inline rule: consume an mdc:start or mdc:end html-comment and emit a custom token.
   md.inline.ruler.before('html_inline', 'mdc_marker', (state, silent) => {
     if (state.src.charCodeAt(state.pos) !== 0x3c /* < */) return false;
